@@ -7,8 +7,16 @@ const { validateMovie, validatePartialMovie } = require('./shcemaas/esquema');
 
 const app = express();
 app.disable('x-powered-by'); // deshabilitar el header x-powered-by
-
+const ACCEPTED_ORIGIN = [
+  'http://localhost:8080',
+  'http://localhost:1234',
+  'http://movies.com',
+];
 app.get('/', (req, res) => {
+  const origin = req.header('origin');
+  if (ACCEPTED_ORIGIN.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', '*'); // permite el acceso a cualquier origen
+  }
   res.json({ message: 'Hola Mundo' });
 });
 
