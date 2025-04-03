@@ -38,45 +38,47 @@ app.get('/movies/:id', (req, res) => {
 app.post('/movies', (req, res) => {
   const result = validateMovie(req.body);
 
-  console.log(result);
-
   if (!result.success) {
-    return res.status(400).json({
-      error: result.error.format(),
-    });
+    // 422 Unprocessable Entity
+    return res.status(400).json({ error: JSON.parse(result.error.message) });
   }
+
+  // en base de datos
   const newMovie = {
-    id: crypto.randomUUID(), //esto genera un id aleatorio
+    id: crypto.randomUUID(), // uuid v4
     ...result.data,
   };
-  movies.push(newMovie); //agregamos la nueva pelicula al array de peliculas
-  return res.status(201).json(newMovie); //devolvemos la nueva pelicula con el status 201 (creado)
+
+  // Esto no sería REST, porque estamos guardando
+  // el estado de la aplicación en memoria
+  movies.push(newMovie);
+
+  res.status(201).json(newMovie);
 });
 
 app.patch('/movies/:id', (req, res) => {
   const result = validatePartialMovie(req.body);
+
   if (!result.success) {
-    return res.status(400).json({
-      error: JSON.parse(result.error.message),
-    });
+    return res.status(400).json({ error: JSON.parse(result.error.message) });
   }
+
   const { id } = req.params;
-  const moviesIndex = movies.findIndex((movies) => movies.id === id);
-  if (moviesIndex == -1) {
-    return res.status(404).json({ error: 'Pelicula no encontrada' });
+  const movieIndex = movies.findIndex((movie) => movie.id === id);
+
+  if (movieIndex === -1) {
+    return res.status(404).json({ message: 'Movie not found' });
   }
 
-const updateMovie={
-  ...movies[moviesIndex],
-  ...result.data,
-}
-movies[moviesIndex]=updateMovie; //actualizamos la pelicula en el array de peliculas
-return res.status(200).json(updateMovie); 
+  const updateMovie = {
+    ...movies[movieIndex],
+    ...result.data,
+  };
 
+  movies[movieIndex] = updateMovie;
+
+  return res.json(updateMovie);
 });
-
-
-
 
 const port = process.env.PORT ?? 5050; // si no existe la variable de entorno PORT, se usa el puerto 5050
 app.listen(port, () => {
