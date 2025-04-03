@@ -1,0 +1,17 @@
+### API REST de Pokemon
+###para obtener todos los pokemons
+GET http://localhost:5050/pokemon/ditto
+
+
+###para crear un nuevo pokemon
+POST http://localhost:5050/pokemon
+Content-Type: application/json
+
+ {
+      "game_index": 132,
+      "version": {
+        "name": "leafgreen",
+        "url": "https://pokeapi.co/api/v2/version/11/"
+      }
+
+ }
