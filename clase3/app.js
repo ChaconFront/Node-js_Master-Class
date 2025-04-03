@@ -88,6 +88,20 @@ app.patch('/movies/:id', (req, res) => {
   return res.json(updateMovie);
 });
 
+
+app.delete('/movies/:id', (req, res) => {
+  const {id}=req.params;
+  const movieIndex = movies.findIndex((movie) => movie.id === id);
+  if (movieIndex === -1) {
+    return res.status(404).json({ message: 'Movie not found' });
+  }
+
+  movies.splice(movieIndex, 1);
+  return res.status(204).json({ message: 'Movie deleted' }); 
+})
+
+
+
 const port = process.env.PORT ?? 5050; // si no existe la variable de entorno PORT, se usa el puerto 5050
 app.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
