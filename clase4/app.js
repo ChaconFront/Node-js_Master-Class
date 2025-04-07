@@ -6,13 +6,13 @@ import express,{json} from 'express';
 import {randomUUID} from 'node:crypto'; 
 //import movies from './movies.json' assert {type: 'json'}; //esta sintaxis no existe
 import { validateMovie, validatePartialMovie } from './shcemaas/esquema.js';
+import { readJSON } from './utils.js';
 
-import fs from 'node:fs';
-const movies= JSON.parse(fs.readFileSync('./movies.json', 'utf-8')) 
+const movies =readJSON('./movies.json'); 
 
 const app = express();
-app.disable('x-powered-by'); // deshabilitar el header x-powered-by
-const ACCEPTED_ORIGIN = [
+app.disable('x-powered-by'); 
+const ACCEPTED_ORIGIN = [ 
   'http://localhost:8080',
   'http://localhost:1234',
   'http://movies.com',
@@ -30,9 +30,9 @@ app.get('/movies', (req, res) => {
   if (genre) {
     const moviesFiltered = movies.filter((movie) =>
       movie.genre.includes(genre)
-    ); //includes es un metodo de string que devuelve true o false si el string contiene el valor que le pasamos);
+    ); 
 
-    return res.json(moviesFiltered); //si no hay query param, devuelve todas las peliculas
+    return res.json(moviesFiltered); 
   }
   return res.json(movies);
 });
