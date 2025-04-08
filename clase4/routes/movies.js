@@ -2,23 +2,31 @@ import { Router } from 'express';
 import { validateMovie, validatePartialMovie } from '../shcemaas/esquema.js';
 import { MovieModel } from '../models/movie.js';
 
-
-
 const moviesRouter = Router();
 
 moviesRouter.get('/', async (req, res) => {
-  const { genre } = req.query;
-  const movies = await MovieModel.getAll({ genre });
-  res.json(movies);
+  try {
+    const { genre } = req.query;
+    const movies = await MovieModel.getAll({ genre });
+    res.json(movies);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
 });
 
 moviesRouter.get('/:id', async (req, res) => {
-  const { id } = req.params;
-  const movie = await MovieModel.getById({ id });
-  if (movie) {
-    res.json(movie);
-  } else {
-    res.status(404).json({ error: 'Pelicula no encontrada' });
+  try {
+    const { id } = req.params;
+    const movie = await MovieModel.getById({ id });
+    if (movie) {
+      res.json(movie);
+    } else {
+      res.status(404).json({ error: 'Pelicula no encontrada' });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
