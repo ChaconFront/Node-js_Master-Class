@@ -1,19 +1,11 @@
 import { Router } from 'express';
 import { validateMovie, validatePartialMovie } from '../shcemaas/esquema.js';
 import { MovieModel } from '../models/movie.js';
+import { MovieController } from '../controllers/movies.controllers.js';
 
 const moviesRouter = Router();
 
-moviesRouter.get('/', async (req, res) => {
-  try {
-    const { genre } = req.query;
-    const movies = await MovieModel.getAll({ genre });
-    res.json(movies);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
+moviesRouter.get('/', MovieController.getAll);
 
 moviesRouter.get('/:id', async (req, res) => {
   try {
@@ -31,15 +23,18 @@ moviesRouter.get('/:id', async (req, res) => {
 });
 
 moviesRouter.post('/', async (req, res) => {
-  const result = validateMovie(req.body);
-  if (!result.success) {
-    // 422 Unprocessable Entity
-    return res.status(400).json({ error: JSON.parse(result.error.message) });
-  }
-  // en base de datos
-  const newMovie = await MovieModel.create({ input: result.data });
+  try {
+    const result = validateMovie(req.body);
+    if (!result.success) {
+      return res.status(400).json({ error: JSON.parse(result.error.message) });
+    }
+    const newMovie = await MovieModel.create({ input: result.data });
 
-  res.status(201).json(newMovie);
+    res.status(201).json(newMovie);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
 });
 
 // PATCH /movies/:id
