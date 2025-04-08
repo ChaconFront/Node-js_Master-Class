@@ -1,7 +1,7 @@
 
 //el sistema de modulos de node es lo que nos permite compartir codigo enjavascript
 import express, {json} from 'express';
-import moviesRouter from './routes/movies.js';
+import moviesRouter from './routes/movies.routes.js';
 import { corsMiddleware } from './middlewares/cors.js'
 
 

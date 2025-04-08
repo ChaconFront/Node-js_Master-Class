@@ -1,6 +1,8 @@
 import { readJSON } from '../utils';
+import { randomUUID } from 'crypto';
 
 const movies = readJSON('../movies.json');
+
 
 export class MovieModel {
   static async getAll({ genre }) {
@@ -19,7 +21,7 @@ export class MovieModel {
 
   static async create({ input }) {
     const newMovie = {
-      id: randomUUID(), // uuid v4
+      id: randomUUID(),
       ...input,
     };
     movies.push(newMovie);
@@ -45,5 +47,5 @@ export class MovieModel {
     return updatedMovie;
   }
 
-  
+
 }
