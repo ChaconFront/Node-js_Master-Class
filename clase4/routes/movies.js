@@ -1,28 +1,23 @@
 import { Router } from 'express';
-import { readJSON } from './utils.js';
-import { randomUUID } from 'node:crypto';
 
-import { validateMovie, validatePartialMovie } from './shcemaas/esquema.js';
 
-const movies = readJSON('./movies.json');
+import { readJSON } from '../utils.js';
+import { validateMovie, validatePartialMovie } from '../shcemaas/esquema.js';
+import { MovieModel } from '../models/movie.js';
 
-const Moviesrouter = Router();
+const movies = readJSON('../movies.json');
 
-Moviesrouter.get('/', (req, res) => {
+const moviesRouter = Router();
+
+moviesRouter.get('/', async (req, res) => {
   const { genre } = req.query;
-  if (genre) {
-    const moviesFiltered = movies.filter((movie) =>
-      movie.genre.some((g) => g.toLowerCase() === genre.toLowerCase())
-    );
-
-    return res.json(moviesFiltered);
-  }
-  return res.json(movies);
+  const movies = await MovieModel.getAll({ genre });
+  res.json(movies);
 });
 
-Moviesrouter.get('/:id', (req, res) => {
+moviesRouter.get('/:id', async (req, res) => {
   const { id } = req.params;
-  const movie = movies.find((movie) => movie.id === id);
+  const movie = await MovieModel.getById({ id });
   if (movie) {
     res.json(movie);
   } else {
@@ -30,24 +25,20 @@ Moviesrouter.get('/:id', (req, res) => {
   }
 });
 
-Moviesrouter.post('/', (req, res) => {
+moviesRouter.post('/', (req, res) => {
   const result = validateMovie(req.body);
   if (!result.success) {
     // 422 Unprocessable Entity
     return res.status(400).json({ error: JSON.parse(result.error.message) });
   }
   // en base de datos
-  const newMovie = {
-    id: randomUUID(), // uuid v4
-    ...result.data,
-  };
-  movies.push(newMovie);
+
   res.status(201).json(newMovie);
 });
 
-
-
-Moviesrouter.patch('/:id', (req, res) => {
+// PATCH /movies/:id
+// Actualiza parcialmente una película existente
+moviesRouter.patch('/:id', (req, res) => {
   const result = validatePartialMovie(req.body);
 
   if (!result.success) {
@@ -71,17 +62,15 @@ Moviesrouter.patch('/:id', (req, res) => {
   return res.json(updateMovie);
 });
 
-
-Moviesrouter.delete('/:id', (req, res) => {
-  const {id}=req.params;
+moviesRouter.delete('/:id', (req, res) => {
+  const { id } = req.params;
   const movieIndex = movies.findIndex((movie) => movie.id === id);
   if (movieIndex === -1) {
     return res.status(404).json({ message: 'Movie not found' });
   }
 
   movies.splice(movieIndex, 1);
-  return res.status(204).json({ message: 'Movie deleted' }); 
-})
+  return res.status(204).json({ message: 'Movie deleted' });
+});
 
-
-export default Moviesrouter;
+export default moviesRouter;
