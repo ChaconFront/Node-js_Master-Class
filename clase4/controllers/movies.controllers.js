@@ -60,7 +60,7 @@ export class MovieController {
     return res.json(updateMovie);
   }
 
-  static  async delete(req, res) {
+  static async delete(req, res) {
     const { id } = req.params;
     const result = await MovieModel.delete({ id });
     if (!result) {
@@ -68,6 +68,4 @@ export class MovieController {
     }
     return res.status(204).json({ message: 'Movie deleted' });
   }
-
-
 }
